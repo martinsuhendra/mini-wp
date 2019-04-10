@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0
+}
+
+body {
+    font-family: 'Avenir';
+    background-color: #f6f5f5
+}
+
+nav {
+    background-color: white
+}
+nav a {
+    display: inline;
+    color: black;
+}
+
+a:hover {
+    text-decoration:none
+}
+
+
+

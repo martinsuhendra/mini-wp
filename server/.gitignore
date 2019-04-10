@@ -1,0 +1,3 @@
+JWT=SECRET_JWT
+.env
+node_modules
