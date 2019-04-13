@@ -1,3 +1,5 @@
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client(process.env.CLIENT_ID);
 const User = require('../models/user-model')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -39,6 +41,42 @@ class UserController {
         .catch((err)=> {
             res.status(500).json(err.message)
         })
+    }
+
+    static google(req, res) {
+        const { token } = req.body
+        let payload;
+        let userToken;
+        client.verifyIdToken({
+            idToken: token,
+            audience: process.env.CLIENT_ID
+        })
+            .then((ticket) => {
+                payload = ticket.getPayload()
+                const userid = payload['sub']
+                
+                return User
+                    .findOne({ username: payload.email })
+            })
+            .then((findOneUser) => {
+                if (!findOneUser) {
+                    return User
+                        .create({ username : payload.email , password: '12345'})
+                } else return findOneUser
+            })
+            .then((user) => {
+                // console.log(user,'===== ini user')
+                const { _id, username} = user
+                const userPayload = { _id, username }
+                // console.log(userPayload)
+                userToken = jwt.sign(userPayload, process.env.JWT)
+                console.log(userToken,'===== ini user tokennnn')
+                req.headers.token = userToken
+                res.status(200).json({ message: 'You are now logged in via Google Sign In!', userToken, details: userPayload })
+            })
+            .catch((err) => { 
+                console.log(err,'ini errorrr')
+                res.status(500).json(err) })
     }
 }
 

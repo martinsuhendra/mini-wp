@@ -4,7 +4,7 @@ const app = express();
 const port = 3000;
 
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://localhost:27017/miniWP', {useNewUrlParser: true});
+mongoose.connect(`${process.env.DB_URL}`, {useNewUrlParser: true});
 
 const cors = require('cors')
 
