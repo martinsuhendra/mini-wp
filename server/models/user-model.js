@@ -4,14 +4,17 @@ const bcrypt = require('bcrypt')
 const saltround = 10;
 const salt = bcrypt.genSaltSync(saltround)
 
+
+
 const userSchema = new Schema({
-    username : {
+    email : {
         type: String,
-        required : [true, 'please input username'],
+        required : [true, 'please input the correct email'],
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
     },
     password : {
         type : String,
-        required : [true, 'please input password']
+        required : [true, 'please input the correct password']
     }
 })
 
@@ -21,11 +24,11 @@ userSchema.pre('save', function(next){
     next()
 })
 
-userSchema.path('username').validate(function (value, respond) {
+userSchema.path('email').validate(function (value, respond) {
     return mongoose
       .model('User')
       .collection
-      .countDocuments({ username: value })
+      .countDocuments({ email: value })
       .then(function (count) {
         if (count > 0) {
           return false
@@ -34,7 +37,7 @@ userSchema.path('username').validate(function (value, respond) {
       .catch(function (err) {
         throw err
       })
-  }, 'Username already exists!!')
+  }, 'Email already exists!!')
 
 const User = mongoose.model('User', userSchema)
 

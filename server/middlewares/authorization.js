@@ -3,15 +3,15 @@ const jwt = require('jsonwebtoken')
 
 module.exports = (req, res, next) => {
     const decoded = jwt.verify(req.headers.token, process.env.JWT)
-    console.log(decoded);
-    
+    // console.log(decoded);
+
     Article
         .findOne({
             _id : req.params.articleId
         })
         .populate('userId')
         .then((article)=> {
-            if (article.userId.username == decoded.username) {
+            if (article.userId.email == decoded.email) {
                 next()
             } else {
                 res.status(401).json({

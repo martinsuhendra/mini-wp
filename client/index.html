@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Vue -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-   
+    <!--Google-->
+    <meta name="google-signin-client_id" content="444283042093-a3k9ghekg9vi7orir6d09ns0olk7jq75.apps.googleusercontent.com">
     <!-- Bootstrap CSS -->
     <!-- Google Fonts-->
     <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
@@ -14,6 +15,7 @@
     <!--vueWysiwyg-->
     <link rel="stylesheet" href="css/vueWysiwyg.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <title>Mini Word Press</title>
     
   </head>
@@ -25,13 +27,13 @@
           <div class="row align-middle">
             <div class="col">
               <div class="row">
-                <div class="col s6 py-4">                
+                <div class="col s6 py-4" v-if="loggedIn">                
                   <a href="#" v-on:click.prevent="showArticles"> Dashboard </a>
                 </div>
-                <div class="col s6 py-4">                
-                  <a href="#" v-on:click.prevent="show='editor'"> Write </a>
+                <div class="col s6 py-4" v-if="loggedIn">                
+                  <a href="#" v-on:click.prevent="showEditor"> Write </a>
                 </div>
-                <div class="col s6 py-4">                
+                <div class="col s6 py-4" v-if="loggedIn">                
                   <a href="#" v-on:click.prevent="showAll"> Read </a>
                 </div>
               </div>
@@ -42,14 +44,14 @@
             <div class="col">
               <div class="row">
                 <div class="col py-3">
-                  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#registerModal">Register</button>
+                  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal" v-on:click="modal = 'register'">Register</button>
                 </div>
                 <div class="col py-3">
                   <div v-if="loggedIn == false">
-                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#loginModal" data-dismiss="modal" >Login</button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal" data-dismiss="modal" v-on:click="modal = 'login'">Login</button>
                   </div>
-                  <div v-else>
-                    <button type="button" class="btn btn-default" v-on:click.prevent="logout">Logout</button>
+                  <div v-else class="py-2">
+                    <a href="#" v-on:click="logout">Logout</a>
                   </div>
                 </div>
               </div>
@@ -59,153 +61,112 @@
       </nav>
       
      
-      <div class="container py-4" v-if=" show === 'home' || loggedIn === false ">
-        <div class="row">
-          <div class="col s4">
-              <img src="img/beach.jpeg" alt="beach1" srcset="" width="235px" height="357px">
+      <div class="container py-4" v-if=" show == '' && loggedIn === false " id="home">
+          <div data-aos="flip-up"  
+          data-aos-offset="200"
+          data-aos-delay="50"
+          data-aos-duration="1000">
+          <div class="row align-middle" style="display: flex; justify-content: center">
+              <div data-aos="flip-up"  
+              data-aos-offset="200"
+              data-aos-delay="50"
+              data-aos-duration="1000">
+                <div class="col s4">
+                    <img src="img/beach.jpeg" alt="beach1" srcset="" width="235px" height="357px">
+                </div>
+              </div>
+              <div data-aos="flip-up"  
+              data-aos-offset="200"
+              data-aos-delay="50"
+              data-aos-duration="2000">
+                <div class="col s4">
+                    <img src="img/street2.jpg" alt="beach2" srcset="" width="235px" height="357px">
+                </div>
+              </div>
+              <div data-aos="flip-up"  
+              data-aos-offset="200"
+              data-aos-delay="50"
+              data-aos-duration="3000">
+                <div class="col s4">
+                    <img src="img/street3.jpg" alt="fisher" srcset="" width="235px" height="357px">
+                </div>
+              </div>
+              </div>
           </div>
-          <div class="col s4">
-              <img src="img/beach.jpg" alt="beach2" srcset="" width="235px" height="357px">
-          </div>
-          <div class="col s4">
-              <img src="img/fisher.jpg" alt="fisher" srcset="" width="235px" height="357px">
-          </div>
-        </div>
-        <h6 class="text-center py-4 ">“Opportunities don’t happen, you create them.”</h6>
-        <h6 class="text-center py-4 ">Join Wordpress, today!</h6>
+            <div class="align-middle">
+              <h6 class="text-center py-4 "><i></i> {{quotesAuthor}}</h6>
+              <h6 class="text-center py-4 ">Join Wordpress, today!</h6>
+            </div>
+          
       </div>
 
+      <div>
+        <div class="g-signin2 ml-4" data-onsuccess="onSignIn" v-show="loggedIn == false" style="margin-left:44%!important"></div>
+      </div>
+      
+   
       <!--Search-->
-      <div class="container py-4 text-center" v-if="loggedIn">
+      <div class="container py-4 text-center" v-if="loggedIn && show !== 'unique'">
         <input type="text" placeholder="Search title" aria-label="Search" v-model="search" class="text-center" >    
       </div>
       
       <!--Wyswig-->
-          <div  v-if="loggedIn && show === 'editor'">
-            <div class="container py-6">
-                <div v-html="text"></div>
-            </div>
-            <div class="container py-4">
-              <form action="" v-on:submit.prevent="addArticle">
-                <input type="text" v-model="title" placeholder="Input Title">
-                <wysiwyg v-model="text"></wysiwyg>
-                <button type="submit" class="btn btn-light" v-on:click.prevent="addArticle">Submit</button>
-              </form>    
-            </div>
+      <div  v-if="loggedIn && show === 'editor' || show === 'editing'">
+          <div class="container py-6">
+              <div v-html="text"></div>
           </div>
+          <div class="container py-4">
+            <form action="">
+              <input v-if="show === 'editor'" type="text" v-model="title" placeholder="Input Title">
+              <input v-else="show === 'editing'" type="text" v-model="title">
+
+              <wysiwyg v-if="show == 'editor'" v-model="content"></wysiwyg>
+              <wysiwyg v-else="show == 'editing'" v-model="content"></wysiwyg>
+
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" v-on:change="getImage" label="File" v-if="show == 'editor'">
+                <label class="custom-file-label"></label>
+                <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" v-on:change="getImage" label="File" v-if="show == 'editing'">
+                <label class="custom-file-label">{{image}}</label>
+              </div>
+              <button v-if="show == 'editor'" type="submit" class="btn btn-light" v-on:click.prevent="addArticle">Submit</button>
+              <button v-if="show == 'editing'" type="submit" class="btn btn-light" v-on:click.prevent="editArticle(articleId)">Edit</button>
+            </form>    
+          </div>
+      </div>
           
         <!--Articles-->
-          <div class="container">
-            <div class="row" v-if="loggedIn && show !== 'editor'" v-for="(entry, index) in filteredArticles" :key="index">
-              <div class="col s4 text-center py-3">
-                <h5>{{entry.title}}</h5>
-                <p id="description">{{entry.content}}</p>
-                <div class="row">
-                  <div class="col d-flex justify-content-end">
-                      <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editModal" v-on:click.prevent="bindState(entry.title, entry.content)" v-if="notAuthorized !== 'yes'">Edit</button>
-                  </div>
-                  <div class="col d-flex justify-content-start">
-                      <button type="button" class="btn btn-default" v-on:click.prevent="deleteArticle(entry._id)" v-if="notAuthorized !== 'yes'">Delete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
+           <show-articles
+            v-bind:not-authorized="notAuthorized"
+            v-bind:filter-articles="filteredArticles"
+            v-bind:article-details="articleDetails"
+            v-on:unique-articles="uniqueArticle"
+            v-on:delete-article="deleteArticle"
+  
+            v-if="loggedIn && show === 'articles'"
+           > </show-articles>
+
+          <!-- Article Details-->
+          <article-details
+          v-bind:show="show"
+          v-bind:title="title"
+          v-bind:email="email"
+          v-bind:content="content"
+          v-bind:created-at="createdAt"
+          v-bind:image="image"
+          > </article-details>
+
+          <p v-if="entries.length == 0 && show == 'articles'" class="text-center"> No article yet, why don't you make one? </p>
           <!--Modals Register-->
-          <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="regiterModalLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="registerModalLabel">Join our Community</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <form>
-                      <div class="form-group">
-                        <label for="user-name" class="col-form-label">Username/Email</label>
-                        <input type="text" v-model="username" class="form-control" id="new-user-name">
-                      </div>
-                      <div class="form-group">
-                        <label for="user-password" class="col-form-label">Password:</label>
-                        <input type="password" v-model="password" class="form-control" id="new-user-password">
-                      </div>
-                    </form>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" v-on:click.prevent="register" data-dismiss="modal">Sign Up</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <modals
+          v-on:success-register="successRegister"
+          v-on:success-login="successLogin"
+          v-bind:modal="modal"
+          ></modals>
             
-            <!--Modal Login-->
-            <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="loginModalLabel">Sign In</h5>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <form>
-                        <div class="form-group">
-                          <label for="user-name" class="col-form-label">Username/Email</label>
-                          <input type="text" v-model="username" class="form-control" id="user-name">
-                        </div>
-                        <div class="form-group">
-                          <label for="user-password" class="col-form-label">Password:</label>
-                          <input type="password" v-model="password" class="form-control" id="user-password">
-                        </div>
-                      </form>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                      <button type="button" class="btn btn-primary" v-on:click.prevent="login">Sign In</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
         </div>
       </div>
-     
-      <!-- Modal Edit-->
-      <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="editeModalLabel">New message</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <form>
-                  <div class="form-group">
-                    <label for="recipient-name" class="col-form-label">Title:</label>
-                    <input type="text" class="form-control" id="title" v-model="title">
-                  </div>
-                  <div class="form-group">
-                    <label for="message-text" class="col-form-label">Content:</label>
-                    <textarea class="form-control" id="content" v-model="content"></textarea>
-                  </div>
-                </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Submit</button>
-              </div>
-            </div>
-          </div>
-      </div>
-
-      
-      
+         
       <!--Dropdown toggle-->
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -214,8 +175,15 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="js/vueWysiwyg.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+   
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    
+    <script src="components/show-articles.js"></script>
+    <script src="components/article-details.js"></script>
+    <script src="components/vueWysiwyg.js"></script>
+    <script src="components/modal-register-login.js"></script>
     <script src="js/index.js"></script>
     <script>
         AOS.init();

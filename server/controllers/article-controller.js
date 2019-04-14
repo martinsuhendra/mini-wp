@@ -14,13 +14,20 @@ class ArticleController {
     }
 
     static add(req, res) {
-        console.log(req.body, 'ini body');
-        
+
+        let gcsUrl = ''
+        if (!req.file) {
+            gcsUrl = 'https://upload.wikimedia.org/wikipedia/en/d/d1/Image_not_available.png'
+        } else {
+            gcsUrl = req.file.gcsUrl
+        }
+
         Article.create({
             title : req.body.title,
             content : req.body.content,
             createdAt : new Date,
-            userId : req.body.id
+            userId : req.authenticatedUser.id,
+            image : gcsUrl
         })
         .then((data)=> {
             res.status(201).json({msg : 'article created', data})
@@ -45,10 +52,24 @@ class ArticleController {
     }
 
     static edit(req, res) {
+        
+        console.log(req.body,'ini req body');
+        console.log(req.file,'ini req file');
+        let gcsUrl = ''
+
+        if (req.file) {
+            gcsUrl = req.file.gcsUrl
+        } else {
+            gcsUrl = req.body.image
+        }
+
         Article
             .findOneAndUpdate({ _id : req.params.articleId}, {
                 title : req.body.title,
-                content: req.body.content
+                content : req.body.content,
+                createdAt : new Date,
+                userId : req.authenticatedUser.id,
+                image : gcsUrl
             })
             .then(()=> {
                 res.status(200).json({msg: `data successfully updated`})
@@ -59,9 +80,9 @@ class ArticleController {
     }
 
     static delete(req, res) {
-        Article.deleteOne({ _id: req.params.id})
+            
+        Article.deleteOne({ _id: req.params.articleId})
         .then((data)=> {
-                console.log(data)
                 res.status(200).json({data, msg: `data has been deleted`})
             })
             .catch((err)=> {
@@ -70,15 +91,12 @@ class ArticleController {
     }
 
     static showOne(req, res) {
-        console.log(req.params,'ini params ya');
-        
         Article
             .findOne({
                 _id : req.params.articleId,
             })
             .populate('userId')
             .then((data)=> {
-                console.log(data,'ini data');
                 res.status(200).json(data)
             })
             .catch(err => {

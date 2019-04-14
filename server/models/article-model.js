@@ -16,7 +16,8 @@ articleSchema = new Schema({
     userId : {
         type : Schema.Types.ObjectId,
         ref : 'User'
-    }
+    },
+    image : String
 })
 
 const Article = mongoose.model('Articles', articleSchema)

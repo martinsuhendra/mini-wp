@@ -7,11 +7,11 @@ const jwt = require('jsonwebtoken')
 class UserController {
     static register(req,res) {
         User.create({
-            username : req.body.username,
+            email : req.body.email,
             password : req.body.password
         })
         .then((data)=> {
-            res.status(201).json({msg: `user is created`, data})
+            res.status(201).json({msg: `user is created, please login to continue!`, data})
         })
         .catch((err)=> {
             res.status(500).json(err.message)
@@ -21,7 +21,7 @@ class UserController {
     static login(req,res) {
          
         User.findOne({
-            username : req.body.username
+            email : req.body.email
         })
         .then((found)=> {
             if (!found) {
@@ -29,12 +29,12 @@ class UserController {
             } else {
                 if (bcrypt.compareSync(req.body.password, found.password)) {                    
                     let token = jwt.sign({
-                        username : found.username,
+                        email : found.email,
                         id : found._id
                     }, process.env.JWT)
                     res.status(200).json({token, id: found._id})
                 } else {
-                    res.status(400).json({msg : `please put the correct username/password`})
+                    res.status(400).json({msg : `please put the correct email/password`})
                 }
             }
         })
@@ -56,18 +56,18 @@ class UserController {
                 const userid = payload['sub']
                 
                 return User
-                    .findOne({ username: payload.email })
+                    .findOne({ email: payload.email })
             })
             .then((findOneUser) => {
                 if (!findOneUser) {
                     return User
-                        .create({ username : payload.email , password: '12345'})
+                        .create({ email : payload.email , password: '12345'})
                 } else return findOneUser
             })
             .then((user) => {
                 // console.log(user,'===== ini user')
-                const { _id, username} = user
-                const userPayload = { _id, username }
+                const { _id, email} = user
+                const userPayload = { _id, email }
                 // console.log(userPayload)
                 userToken = jwt.sign(userPayload, process.env.JWT)
                 console.log(userToken,'===== ini user tokennnn')

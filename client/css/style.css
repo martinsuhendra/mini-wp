@@ -21,4 +21,12 @@ a:hover {
 }
 
 
+.article {
+    margin: auto;
+    display: flex;
+}
+
+pb-4, .py-4 {
+    padding-bottom: 0.5rem!important;
+}
 
