@@ -34,7 +34,11 @@ let app = new Vue ({
             
         },
         showAll() {
-            axios.get(`${serverURL}/articles`)
+            axios.get(`${serverURL}/articles`,{
+                headers : {
+                    token : localStorage.getItem('token')
+                }
+            })
             .then(({data})=> {
                 this.entries = data
                 this.show = 'articles'

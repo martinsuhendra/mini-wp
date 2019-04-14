@@ -13,7 +13,7 @@ const multer = Multer({
     },
   });
 
-router.get('/', articleController.showAll)
+router.get('/', authentication, articleController.showAll)
 router.post('/',multer.single('image'),authentication, gcsMiddlewares.sendUploadToGCS,articleController.add)
 router.get('/:userId/:articleId', articleController.showOne)
 router.get('/:id', articleController.showMine)
